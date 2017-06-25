@@ -53,7 +53,7 @@ type Msg
 
 seed0 : Seed
 seed0 =
-    Random.initialSeed 34
+    Random.initialSeed 12
 
 
 food0 : ( Int, Int )
@@ -89,7 +89,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ presses (\code -> Presses (fromCode code))
-        , Time.every (100 * millisecond) Tick
+        , Time.every (60 * millisecond) Tick
         ]
 
 
@@ -263,18 +263,18 @@ view model =
 
         boxStyle =
             Html.Attributes.style
-                [ ( "border", "3px solid black" )
+                [ ( "border", "4px solid black" )
                 , ( "position", "absolute" )
                 , ( "left", "0" )
                 , ( "right", "0" )
-                , ( "top", "-15px" )
+                , ( "top", "20" )
                 , ( "bottom", "0" )
                 , ( "margin", "auto" )
                 , ( "max-width", "100%" )
                 , ( "max-height", "100%" )
                 , ( "overflow", "auto" )
-                , ( "width", "600px" )
-                , ( "height", "600px" )
+                , ( "width", "400px" )
+                , ( "height", "400px" )
                 ]
 
         message =
@@ -283,12 +283,13 @@ view model =
             else
                 ""
     in
-        div []
-            [ h3 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text ("Score: " ++ toString (model.score)) ]
-            , h2 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text message ]
+        div [ Html.Attributes.style [ ( "backgroundColor", "light grey" ) ] ]
+            [ h1 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text ("VIMSNAKE") ]
+            , h3 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text ("Score: " ++ toString (model.score)) ]
+            , h2 [ Html.Attributes.style [ ( "text-align", "center" ), ( "font-style", "italic" ) ] ] [ Html.text message ]
             , svg
                 [ viewBox "0 0 100 100", Svg.Attributes.width "50%", boxStyle ]
-                [ polyline [ fill "none", stroke "black", points snakeStr ] []
-                , circle [ cx (toString (Tuple.first model.food)), cy (toString (Tuple.second model.food)), r "1" ] []
+                [ polyline [ fill "none", stroke "green", points snakeStr ] []
+                , circle [ cx (toString (Tuple.first model.food)), cy (toString (Tuple.second model.food)), r "1", fill "#AF1314", stroke "#AF1314" ] []
                 ]
             ]
