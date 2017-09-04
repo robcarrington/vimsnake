@@ -32,6 +32,7 @@ type alias Model =
     , seed : Seed
     , score : Int
     , dead : Bool
+    , started : Bool
     }
 
 
@@ -53,12 +54,21 @@ type Msg
 
 seed0 : Seed
 seed0 =
-    Random.initialSeed 12
+    Random.initialSeed 1
+
+
+randomStuff =
+    Random.step randomPoint seed0
 
 
 food0 : ( Int, Int )
 food0 =
-    Tuple.first (Random.step randomPoint seed0)
+    Tuple.first randomStuff
+
+
+seed1 : Seed
+seed1 =
+    Tuple.second randomStuff
 
 
 init : ( Model, Cmd Msg )
@@ -73,9 +83,10 @@ init =
             ]
       , dir = Right
       , food = food0
-      , seed = seed0
+      , seed = seed1
       , score = 0
       , dead = False
+      , started = False
       }
     , Cmd.none
     )
@@ -182,12 +193,17 @@ update msg model =
     case msg of
         Presses code ->
             let
+                initModel =
+                    Tuple.first init
+
                 newModel =
                     if model.dead then
                         if (code == '\x0D') then
-                            Tuple.first init
+                            { initModel | started = True }
                         else
                             model
+                    else if not model.started then
+                        { model | started = True }
                     else
                         redirect code model
             in
@@ -229,7 +245,7 @@ update msg model =
                                 snakeChecked
 
                         boundsChecked =
-                            if (newSnakeHead.x < 0) || (newSnakeHead.x > 100) || (newSnakeHead.y < 0) || (newSnakeHead.y > 100) then
+                            if (newSnakeHead.x < 1) || (newSnakeHead.x > 99) || (newSnakeHead.y < 1) || (newSnakeHead.y > 99) then
                                 { foodChecked | dead = True }
                             else if (member newSnakeHead model.snake) then
                                 { foodChecked | dead = True }
@@ -237,7 +253,7 @@ update msg model =
                                 foodChecked
 
                         deathChecked =
-                            if model.dead == True then
+                            if not model.started || model.dead then
                                 model
                             else
                                 boundsChecked
@@ -267,7 +283,7 @@ view model =
                 , ( "position", "absolute" )
                 , ( "left", "0" )
                 , ( "right", "0" )
-                , ( "top", "20" )
+                , ( "top", "0" )
                 , ( "bottom", "0" )
                 , ( "margin", "auto" )
                 , ( "max-width", "100%" )
@@ -275,21 +291,65 @@ view model =
                 , ( "overflow", "auto" )
                 , ( "width", "400px" )
                 , ( "height", "400px" )
+                , ( "backgroundColor", "#D3D3D3" )
                 ]
 
-        message =
-            if model.dead == True then
-                "Game Over! Press enter to restart"
-            else
-                ""
-    in
-        div [ Html.Attributes.style [ ( "backgroundColor", "light grey" ) ] ]
-            [ h1 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text ("VIMSNAKE") ]
-            , h3 [ Html.Attributes.style [ ( "text-align", "center" ) ] ] [ Html.text ("Score: " ++ toString (model.score)) ]
-            , h2 [ Html.Attributes.style [ ( "text-align", "center" ), ( "font-style", "italic" ) ] ] [ Html.text message ]
-            , svg
-                [ viewBox "0 0 100 100", Svg.Attributes.width "50%", boxStyle ]
-                [ polyline [ fill "none", stroke "green", points snakeStr ] []
-                , circle [ cx (toString (Tuple.first model.food)), cy (toString (Tuple.second model.food)), r "1", fill "#AF1314", stroke "#AF1314" ] []
+        directionsStyle =
+            Html.Attributes.style
+                [ ( "position", "absolute" )
+                , ( "left", "0" )
+                , ( "right", "0" )
+                , ( "top", "115%" )
+                , ( "bottom", "0" )
+                , ( "margin", "auto" )
+                , ( "max-width", "100%" )
+                , ( "max-height", "100%" )
+                , ( "overflow", "auto" )
+                , ( "width", "400px" )
+                , ( "height", "400px" )
+                , ( "color", "white" )
+                , ( "text-align", "center" )
                 ]
+
+        titleStyle =
+            Html.Attributes.style
+                [ ( "text-align", "center" )
+                , ( "padding-top", "5%" )
+                , ( "color", "#98FB98" )
+                , ( "text-shadow", "2px 2px 4px grey" )
+                ]
+
+        hideForIntro =
+            if model.started then
+                "inherit"
+            else
+                "none"
+
+        message1 =
+            if not model.started then
+                Svg.text_ [ x "25", y "45", fontSize "12", fill "green" ] [ Svg.text "VimSnake" ]
+            else if model.dead then
+                Svg.text_ [ x "20", y "45", fontSize "10", fill "#AF1314" ] [ Svg.text "GAME OVER!" ]
+            else
+                Svg.text_ [] []
+
+        message2 =
+            if not model.started then
+                -- Svg.text_ [ x "20", y "55", fontSize "5" ] [ Svg.text "Left: h Down: j Up: k Right: l" ]
+                Svg.text_ [ x "29", y "55", fontSize "5", fill "#474747" ] [ Svg.text "Press any key to start" ]
+            else if model.dead then
+                Svg.text_ [ x "30", y "53", fontSize "5", fill "#474747" ] [ Svg.text "Press enter to restart" ]
+            else
+                Svg.text_ [] []
+    in
+        div [ Html.Attributes.style [ ( "backgroundColor", "black" ), ( "height", "100%" ), ( "marginTop", "-20px" ) ] ]
+            [ svg
+                [ viewBox "0 0 100 100", Svg.Attributes.width "50%", boxStyle ]
+                [ polyline [ fill "none", stroke "green", points snakeStr, display hideForIntro ] []
+                , circle [ cx (toString (Tuple.first model.food)), cy (toString (Tuple.second model.food)), r "1", fill "#AF1314", stroke "#AF1314", display hideForIntro ] []
+                , Svg.text_ [ x "3", y "6", fontSize "4", fill "#696969", display hideForIntro ] [ Svg.text ("Score: " ++ toString (model.score)) ]
+                , message1
+                , message2
+                ]
+            , h3 [ directionsStyle ] [ Html.text ("Left: h Down: j Up: k Right: l") ]
             ]
