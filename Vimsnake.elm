@@ -324,7 +324,7 @@ view model =
             else
                 Svg.text_ [] []
     in
-        div [ Html.Attributes.style [ ( "fontFamily", "Verdana, Geneva, sans-serif" ), ( "backgroundColor", "black" ), ( "height", "100%" ), ( "marginTop", "-20px" ) ] ]
+        div [ Html.Attributes.style [ ( "fontFamily", "Verdana, Geneva, sans-serif" ), ( "backgroundColor", "black" ), ( "width", "100%" ), ( "height", "100vh" ), ( "marginTop", "-20px" ) ] ]
             [ svg
                 [ viewBox "0 0 100 100", Svg.Attributes.width "50%", boxStyle ]
                 [ polyline [ fill "none", stroke "green", points snakeStr, display hideForIntro ] []
