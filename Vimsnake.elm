@@ -294,23 +294,6 @@ view model =
                 , ( "backgroundColor", "#D3D3D3" )
                 ]
 
-        directionsStyle =
-            Html.Attributes.style
-                [ ( "position", "absolute" )
-                , ( "left", "0" )
-                , ( "right", "0" )
-                , ( "top", "115%" )
-                , ( "bottom", "0" )
-                , ( "margin", "auto" )
-                , ( "max-width", "100%" )
-                , ( "max-height", "100%" )
-                , ( "overflow", "auto" )
-                , ( "width", "400px" )
-                , ( "height", "400px" )
-                , ( "color", "white" )
-                , ( "text-align", "center" )
-                ]
-
         titleStyle =
             Html.Attributes.style
                 [ ( "text-align", "center" )
@@ -327,7 +310,7 @@ view model =
 
         message1 =
             if not model.started then
-                Svg.text_ [ x "25", y "45", fontSize "12", fill "green" ] [ Svg.text "VimSnake" ]
+                Svg.text_ [ x "19", y "45", fontSize "12", fill "green" ] [ Svg.text "VimSnake" ]
             else if model.dead then
                 Svg.text_ [ x "20", y "45", fontSize "10", fill "#AF1314" ] [ Svg.text "GAME OVER!" ]
             else
@@ -335,21 +318,20 @@ view model =
 
         message2 =
             if not model.started then
-                -- Svg.text_ [ x "20", y "55", fontSize "5" ] [ Svg.text "Left: h Down: j Up: k Right: l" ]
-                Svg.text_ [ x "29", y "55", fontSize "5", fill "#474747" ] [ Svg.text "Press any key to start" ]
+                Svg.text_ [ x "22", y "55", fontSize "5", fill "#474747" ] [ Svg.text "Press any key to start" ]
             else if model.dead then
-                Svg.text_ [ x "30", y "53", fontSize "5", fill "#474747" ] [ Svg.text "Press enter to restart" ]
+                Svg.text_ [ x "26", y "53", fontSize "5", fill "#474747" ] [ Svg.text "Press enter to restart" ]
             else
                 Svg.text_ [] []
     in
-        div [ Html.Attributes.style [ ( "backgroundColor", "black" ), ( "height", "100%" ), ( "marginTop", "-20px" ) ] ]
+        div [ Html.Attributes.style [ ( "fontFamily", "Verdana, Geneva, sans-serif" ), ( "backgroundColor", "black" ), ( "height", "100%" ), ( "marginTop", "-20px" ) ] ]
             [ svg
                 [ viewBox "0 0 100 100", Svg.Attributes.width "50%", boxStyle ]
                 [ polyline [ fill "none", stroke "green", points snakeStr, display hideForIntro ] []
                 , circle [ cx (toString (Tuple.first model.food)), cy (toString (Tuple.second model.food)), r "1", fill "#AF1314", stroke "#AF1314", display hideForIntro ] []
-                , Svg.text_ [ x "3", y "6", fontSize "4", fill "#696969", display hideForIntro ] [ Svg.text ("Score: " ++ toString (model.score)) ]
+                , Svg.text_ [ x "2", y "6", fontSize "4", fill "black", display hideForIntro ] [ Svg.text ("Score: " ++ toString (model.score)) ]
                 , message1
                 , message2
+                , image [ xlinkHref "./vim_keys.png", x "60", y "2", Svg.Attributes.height "10", display hideForIntro ] []
                 ]
-            , h3 [ directionsStyle ] [ Html.text ("Left: h Down: j Up: k Right: l") ]
             ]
